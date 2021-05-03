@@ -31,7 +31,7 @@ export class TaskRepository extends Repository<Task> {
     if (search) {
       query.andWhere(
         '(task.title LIKE :search OR task.description LIKE :search)',
-        { search: `%${search}%` },
+        { search: `%${search}%` }, // percent symbols indicate partial matches
       )
     }
 
