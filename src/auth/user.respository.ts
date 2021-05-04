@@ -17,13 +17,29 @@ export class UserRepository extends Repository<User> {
     try {
       await user.save()
     } catch (error) {
-      // Duplicate username code
+      // is error code a duplicate username error
       if (error.code === '23505') {
         throw new ConflictException('Username already exists')
       } else {
         throw new InternalServerErrorException()
       }
     }
+  }
+
+  async validateUserPassword(
+    authCredentialsDto: AuthCredentialsDto,
+  ): Promise<string | null> {
+    const { username, password } = authCredentialsDto
+
+    const user = await this.findOne({ username })
+
+    console.log(user)
+
+    if (user && (await user.validatePassword(password))) {
+      return user.username
+    }
+
+    return null
   }
 
   private hashPassword(password: string, salt: string): Promise<string> {
