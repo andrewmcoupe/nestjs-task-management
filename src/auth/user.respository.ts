@@ -33,8 +33,6 @@ export class UserRepository extends Repository<User> {
 
     const user = await this.findOne({ username })
 
-    console.log(user)
-
     if (user && (await user.validatePassword(password))) {
       return user.username
     }
