@@ -40,7 +40,7 @@ export class UserRepository extends Repository<User> {
     return null
   }
 
-  private hashPassword(password: string, salt: string): Promise<string> {
+  hashPassword(password: string, salt: string): Promise<string> {
     return bcrypt.hash(password, salt)
   }
 }
