@@ -7,11 +7,12 @@ import { User } from '../auth/user.entity'
 import { Task } from './task.entity'
 import { NotFoundException } from '@nestjs/common'
 
-const mockUser = { username: 'walterWhite' } as User
+const mockUser = { username: 'walterWhite', id: 123 } as User
 
 const mockTaskRepository = () => ({
   getTasks: jest.fn(),
   findOne: jest.fn(),
+  delete: jest.fn(),
 })
 
 const mockTasks = [
@@ -79,6 +80,25 @@ describe('Tasks service', () => {
       taskRepository.findOne.mockResolvedValue(undefined)
 
       await expect(tasksService.getTaskById(-1, mockUser)).rejects.toThrow(
+        NotFoundException,
+      )
+    })
+  })
+
+  describe('deleteTaskById', () => {
+    it('should delete a task by ID from the repository', async () => {
+      taskRepository.delete.mockResolvedValue({ raw: '', affected: 1 })
+
+      const result = await tasksService.deleteTaskById(1, mockUser)
+
+      expect(taskRepository.delete).toHaveBeenCalledWith({ id: 1, userId: 123 })
+      expect(result).toBe(undefined)
+    })
+
+    it('should throw a not found exception if a task cannot be deleted', async () => {
+      taskRepository.delete.mockResolvedValue({ raw: '', affected: 0 })
+
+      await expect(tasksService.deleteTaskById(-1, mockUser)).rejects.toThrow(
         NotFoundException,
       )
     })
